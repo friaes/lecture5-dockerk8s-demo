@@ -6,6 +6,7 @@ A Task Manager app demonstrating Docker containerization and Kubernetes orchestr
 
 ## Architecture
 
+**Docker Compose:**
 ```mermaid
 flowchart LR
     subgraph Docker Network
@@ -17,6 +18,47 @@ flowchart LR
     User([👤 User]) --> Web
     Web <--> Redis
     Web <--> Postgres
+```
+
+**Kubernetes:**
+```mermaid
+flowchart TB
+    subgraph Kubernetes Cluster
+        subgraph Deployment: lecture5-web
+            Pod1[Pod: web-xxx1\nFlask:5000]
+            Pod2[Pod: web-xxx2\nFlask:5000]
+            Pod3[Pod: web-xxx3\nFlask:5000]
+        end
+        
+        subgraph Deployment: postgres
+            PodDB[Pod: postgres-xxx\nPostgreSQL:5432]
+        end
+        
+        subgraph Deployment: redis
+            PodRedis[Pod: redis-xxx\nRedis:6379]
+        end
+        
+        LB[LoadBalancer Service\nlecture5-web-service\n:80]
+        SvcDB[ClusterIP Service\ndb:5432]
+        SvcRedis[ClusterIP Service\nredis:6379]
+        
+        LB --> Pod1
+        LB --> Pod2
+        LB --> Pod3
+        
+        Pod1 --> SvcDB
+        Pod2 --> SvcDB
+        Pod3 --> SvcDB
+        
+        Pod1 --> SvcRedis
+        Pod2 --> SvcRedis
+        Pod3 --> SvcRedis
+        
+        SvcDB --> PodDB
+        SvcRedis --> PodRedis
+    end
+    
+    User([👤 User]) --> LB
 ```
 
 ## Project Structure
